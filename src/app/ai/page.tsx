@@ -95,7 +95,7 @@ export default function AIExtraction() {
         fullName: data.name || '',
         fatherName: data.fatherName || '',
         motherName: data.motherName || '',
-        dob: data.dateOfBirth ? reformatInputDate(data.dateOfBirth) : '',
+        dob: data.dateOfBirth || '',
         houseNo: data.houseNo || '00',
         streetLocality: data.streetLocality || '',
         village: data.village || '',
@@ -138,7 +138,6 @@ export default function AIExtraction() {
       if (!formData.fullName.trim()) stepErrors.fullName = 'Full Name is required.';
       if (!formData.fatherName.trim()) stepErrors.fatherName = "Father's Name is required.";
       if (!formData.dob) stepErrors.dob = 'Date of Birth is required.';
-      if (!formData.houseNo.trim()) stepErrors.houseNo = 'House Number is required.';
       if (!formData.village.trim()) stepErrors.village = 'Village / City is required.';
       if (!formData.thana.trim()) stepErrors.thana = 'Police Station / Thana is required.';
       if (!formData.tehsil.trim()) stepErrors.tehsil = 'Tehsil is required.';
@@ -186,11 +185,29 @@ export default function AIExtraction() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate certificate.');
-      }
+      // Open the certificate in a new tab (triggers automatic browser print dialog)
+      window.open(`/api/certificates/${data.id}/html`, '_blank');
 
-      setGeneratedCertificate(data);
+      // Reset form and return to step 1
+      setFormData({
+        fullName: '',
+        fatherName: '',
+        motherName: '',
+        dob: '',
+        houseNo: '00',
+        streetLocality: '',
+        village: '',
+        thana: '',
+        tehsil: '',
+        district: '',
+        state: 'उत्तर प्रदेश',
+        pinCode: '',
+        photoBase64: '',
+        qrCodeEnabled: true,
+      });
+      setDocImageBase64(null);
+      setConfidence({});
+      setCurrentStep(1);
     } catch (err: any) {
       console.error(err);
       setErrors({ form: err.message || 'An unexpected error occurred. Please try again.' });
@@ -296,18 +313,26 @@ export default function AIExtraction() {
               <CertificatePreview certificate={generatedCertificate} />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col lg:flex-row gap-3 justify-center w-full">
               <a
-                href={`/api/certificates/${generatedCertificate.id}/pdf`}
-                className="px-6 py-3 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-sm rounded-lg shadow-sm transition-colors text-center"
+                href={`/api/certificates/${generatedCertificate.id}/html`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-xs rounded-lg shadow-sm transition-colors text-center flex-1 uppercase tracking-wider"
               >
-                Download PDF
+                Print / Save PDF
+              </a>
+              <a
+                href={`/api/certificates/${generatedCertificate.id}/html?download=true`}
+                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
+              >
+                Download HTML
               </a>
               <Link
                 href={`/verify/${generatedCertificate.id}`}
-                className="px-6 py-3 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-sm rounded-lg transition-colors text-center"
+                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
               >
-                Go to Verification Page
+                Verify Record
               </Link>
             </div>
           </div>
@@ -452,15 +477,16 @@ export default function AIExtraction() {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-muted-text">
-                        Date of Birth
+                        जन्म तिथि (Date of Birth)
                       </label>
                       {renderConfidenceBadge('dateOfBirth')}
                     </div>
                     <input
-                      type="date"
+                      type="text"
                       name="dob"
                       value={formData.dob}
                       onChange={handleInputChange}
+                      placeholder="e.g. 14/07/2026"
                       className={cn(
                         "w-full px-4 py-2.5 bg-white dark:bg-stone-900 border text-foreground text-sm rounded-lg outline-hidden transition-border shadow-2xs",
                         errors.dob ? "border-red-500" : "border-border-color"
@@ -473,26 +499,7 @@ export default function AIExtraction() {
                   <div className="pt-4 border-t border-border-color/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <h3 className="sm:col-span-2 text-xs font-bold text-foreground">Extracted Address Details</h3>
                     
-                    {/* House No */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-text">
-                          House / Building
-                        </label>
-                        {renderConfidenceBadge('houseNo')}
-                      </div>
-                      <input
-                        type="text"
-                        name="houseNo"
-                        value={formData.houseNo}
-                        onChange={handleInputChange}
-                        className={cn(
-                          "w-full px-4 py-2.5 bg-white dark:bg-stone-900 border text-foreground text-sm rounded-lg outline-hidden transition-border shadow-2xs",
-                          errors.houseNo ? "border-red-500" : "border-border-color"
-                        )}
-                      />
-                      {errors.houseNo && <p className="mt-1 text-xs text-red-500">{errors.houseNo}</p>}
-                    </div>
+
 
                     {/* Street Locality */}
                     <div>

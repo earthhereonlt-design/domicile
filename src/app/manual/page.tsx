@@ -9,43 +9,42 @@ import PhotoUpload from '@/components/PhotoUpload';
 import { cn, formatDate } from '@/lib/utils';
 import CertificatePreview from '@/components/CertificatePreview';
 
-// Wizard steps definitions
-const STEPS = [
-  { id: 1, name: 'District' },
-  { id: 2, name: 'Basic Info' },
-  { id: 3, name: 'Address' },
-  { id: 4, name: 'Identifiers' },
-  { id: 5, name: 'Photo' },
-  { id: 6, name: 'Verification' },
-  { id: 7, name: 'Generate' },
-];
+  // Wizard steps definitions
+  const STEPS = [
+    { id: 1, name: 'District' },
+    { id: 2, name: 'Basic Info' },
+    { id: 3, name: 'Address' },
+    { id: 4, name: 'Identifiers' },
+    { id: 5, name: 'Photo' },
+    { id: 6, name: 'Generate' },
+  ];
 
-export default function ManualEntry() {
-  const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // Final generated certificate result
-  const [generatedCertificate, setGeneratedCertificate] = useState<any | null>(null);
+  export default function ManualEntry() {
+    const router = useRouter();
+    const [currentStep, setCurrentStep] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    
+    // Final generated certificate result
+    const [generatedCertificate, setGeneratedCertificate] = useState<any | null>(null);
 
-  // Form State
-  const [formData, setFormData] = useState({
-    fullName: '',
-    fatherName: '',
-    motherName: '',
-    dob: '',
-    houseNo: '00',
-    streetLocality: '',
-    village: '',
-    thana: '',
-    tehsil: '',
-    district: '',
-    state: 'उत्तर प्रदेश',
-    pinCode: '',
-    photoBase64: '',
-    qrCodeEnabled: true,
-  });
+    // Form State
+    const [formData, setFormData] = useState({
+      fullName: '',
+      fatherName: '',
+      motherName: '',
+      dob: '',
+      houseNo: '00',
+      streetLocality: '',
+      village: '',
+      thana: '',
+      tehsil: '',
+      district: '',
+      state: 'उत्तर प्रदेश',
+      pinCode: '',
+      photoBase64: '',
+      qrCodeEnabled: true,
+    });
 
   // Handle text input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,9 +78,6 @@ export default function ManualEntry() {
         stepErrors.dob = 'Date of Birth is required.';
       }
     } else if (step === 3) {
-      if (!formData.houseNo.trim()) {
-        stepErrors.houseNo = 'House / Building Number is required.';
-      }
       if (!formData.village.trim()) {
         stepErrors.village = 'Village / Town / City is required.';
       }
@@ -102,11 +98,7 @@ export default function ManualEntry() {
       } else if (!/^\d{6}$/.test(formData.pinCode)) {
         stepErrors.pinCode = 'PIN Code must be exactly 6 digits.';
       }
-    } else if (step === 5) {
-      if (!formData.photoBase64) {
-        stepErrors.photoBase64 = 'Please upload a candidate photo to proceed.';
-      }
-    }
+
 
     setErrors(stepErrors);
     return Object.keys(stepErrors).length === 0;
@@ -152,7 +144,27 @@ export default function ManualEntry() {
         throw new Error(data.error || 'Failed to generate certificate.');
       }
 
-      setGeneratedCertificate(data);
+      // Open the certificate in a new tab (triggers automatic browser print dialog)
+      window.open(`/api/certificates/${data.id}/html`, '_blank');
+
+      // Reset form on current tab and go back to step 1
+      setFormData({
+        fullName: '',
+        fatherName: '',
+        motherName: '',
+        dob: '',
+        houseNo: '00',
+        streetLocality: '',
+        village: '',
+        thana: '',
+        tehsil: '',
+        district: '',
+        state: 'उत्तर प्रदेश',
+        pinCode: '',
+        photoBase64: '',
+        qrCodeEnabled: true,
+      });
+      setCurrentStep(1);
     } catch (err: any) {
       console.error(err);
       setErrors({ form: err.message || 'An unexpected error occurred. Please try again.' });
@@ -225,18 +237,26 @@ export default function ManualEntry() {
               <CertificatePreview certificate={generatedCertificate} />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col lg:flex-row gap-3 justify-center w-full">
               <a
-                href={`/api/certificates/${generatedCertificate.id}/pdf`}
-                className="px-6 py-3 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-sm rounded-lg shadow-sm transition-colors text-center"
+                href={`/api/certificates/${generatedCertificate.id}/html`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-xs rounded-lg shadow-sm transition-colors text-center flex-1 uppercase tracking-wider"
               >
-                Download PDF
+                Print / Save PDF
+              </a>
+              <a
+                href={`/api/certificates/${generatedCertificate.id}/html?download=true`}
+                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
+              >
+                Download HTML
               </a>
               <Link
                 href={`/verify/${generatedCertificate.id}`}
-                className="px-6 py-3 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-sm rounded-lg transition-colors text-center"
+                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
               >
-                Go to Verification Page
+                Verify Record
               </Link>
             </div>
 
@@ -245,19 +265,19 @@ export default function ManualEntry() {
                 onClick={() => {
                   setGeneratedCertificate(null);
                   setFormData({
-                    fullName: '',
-                    fatherName: '',
-                    motherName: '',
-                    dob: '',
+                    fullName: 'हिमांशु कुमार/Himanshu Kumar',
+                    fatherName: 'अरुण कुमार',
+                    motherName: 'संतोष देवी',
+                    dob: 'ग्राम नगला पोस्ट पलिया कलां',
                     houseNo: '00',
-                    streetLocality: '',
-                    village: '',
-                    thana: '',
-                    tehsil: '',
-                    district: '',
+                    streetLocality: 'ग्राम नगला पोस्ट पलिया कलां',
+                    village: 'नगला',
+                    thana: 'पलिया कलां',
+                    tehsil: 'पलिया',
+                    district: 'खीरी / Kheri',
                     state: 'उत्तर प्रदेश',
-                    pinCode: '',
-                    photoBase64: '',
+                    pinCode: '262902',
+                    photoBase64: formData.photoBase64, // retain photo
                     qrCodeEnabled: true,
                   });
                   setCurrentStep(1);
@@ -355,13 +375,14 @@ export default function ManualEntry() {
                   {/* Date of birth */}
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-muted-text mb-2">
-                      Date of Birth
+                      जन्म तिथि (Date of Birth)
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       name="dob"
                       value={formData.dob}
                       onChange={handleInputChange}
+                      placeholder="e.g. 14/07/2026"
                       className={cn(
                         "w-full px-4 py-3 bg-white dark:bg-stone-900 border text-foreground text-sm rounded-lg outline-hidden transition-border shadow-2xs",
                         errors.dob ? "border-red-500" : "border-border-color"
@@ -384,24 +405,7 @@ export default function ManualEntry() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* House No */}
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-text mb-2">
-                      House / Building Number
-                    </label>
-                    <input
-                      type="text"
-                      name="houseNo"
-                      value={formData.houseNo}
-                      onChange={handleInputChange}
-                      placeholder="e.g. 00 or A-21"
-                      className={cn(
-                        "w-full px-4 py-3 bg-white dark:bg-stone-900 border text-foreground text-sm rounded-lg outline-hidden transition-border shadow-2xs",
-                        errors.houseNo ? "border-red-500" : "border-border-color"
-                      )}
-                    />
-                    {errors.houseNo && <p className="mt-2 text-xs text-red-500">{errors.houseNo}</p>}
-                  </div>
+
 
                   {/* Street Locality */}
                   <div className="sm:col-span-2">
@@ -605,39 +609,8 @@ export default function ManualEntry() {
               </div>
             )}
 
-            {/* Step 6: QR Code Verification option */}
+            {/* Step 6: Confirmation & Generate */}
             {currentStep === 6 && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-lg font-bold text-foreground mb-1">Digital Verification</h2>
-                  <p className="text-xs text-muted-text">
-                    Generate an inline QR Code linking to a secure, public verification page.
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 border border-border-color rounded-lg bg-white dark:bg-stone-900 shadow-2xs">
-                  <input
-                    type="checkbox"
-                    id="qrCodeEnabled"
-                    checked={formData.qrCodeEnabled}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, qrCodeEnabled: e.target.checked }))}
-                    className="w-4 h-4 mt-0.5 rounded text-accent accent-accent border-border-color"
-                  />
-                  <div>
-                    <label htmlFor="qrCodeEnabled" className="block text-sm font-semibold text-foreground mb-1 cursor-pointer">
-                      Generate Verification QR Code
-                    </label>
-                    <p className="text-xs text-muted-text">
-                      Encodes a secure digital URL: <code className="bg-stone-100 dark:bg-stone-800 px-1 rounded text-foreground font-mono">https://[domain]/verify/[certificate-id]</code>.
-                      No personal demographic details will be leaked inside the QR payload.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 7: Confirmation & Generate */}
-            {currentStep === 7 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-lg font-bold text-foreground mb-1">Confirm and Compile</h2>

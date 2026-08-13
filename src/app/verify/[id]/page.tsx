@@ -65,18 +65,26 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
             <CertificatePreview certificate={certificate} />
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col lg:flex-row gap-3 justify-center w-full mt-8">
             <a
-              href={`/api/certificates/${certificate.id}/pdf`}
-              className="px-6 py-3 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-sm rounded-lg shadow-sm transition-colors text-center"
+              href={`/api/certificates/${certificate.id}/html`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-xs rounded-lg shadow-sm transition-colors text-center flex-1 uppercase tracking-wider"
             >
-              Download PDF Copy
+              Print / Save PDF
+            </a>
+            <a
+              href={`/api/certificates/${certificate.id}/html?download=true`}
+              className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
+            >
+              Download HTML
             </a>
             <Link
               href="/"
-              className="px-6 py-3 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-sm rounded-lg transition-colors text-center"
+              className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
             >
-              Go to Home Screen
+              Go Home
             </Link>
           </div>
         </div>

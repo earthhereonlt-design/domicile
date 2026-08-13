@@ -163,11 +163,20 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
       const qrX = (doc.page.width / 2) - (qrSize / 2);
       const qrY = paraStartY + 95;
 
-      const protocol = host.startsWith('localhost') ? 'http' : 'https';
-      const verifyUrl = `${protocol}://${host}/verify/${certificate.id}`;
+      const qrData = `आवेदन क्र०: ${certificate.applicationId}
+प्रमाणपत्र क्र०: ${certificate.certificateId}
+प्रमाणित किया जाता है कि: ${certificate.fullName}
+पुत्र/पुत्री: ${certificate.fatherName}
+माता का नाम: ${certificate.motherName || 'संतोष देवी'}
+मकान नम्बर: ${certificate.houseNo}
+ग्राम: ${certificate.village}
+थाना: ${certificate.thana}
+तहसील: ${certificate.tehsil}
+जिला: ${certificate.district}
+जारी दिनांक: ${formatDate(certificate.issueDate)}`;
 
       try {
-        const qrBuffer = await QRCode.toBuffer(verifyUrl, {
+        const qrBuffer = await QRCode.toBuffer(qrData, {
           errorCorrectionLevel: 'M',
           margin: 1,
           width: qrSize,
@@ -180,13 +189,7 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
       // 11. Signatory Columns (Matching DOMICILE.html structure)
       const sigY = qrY + qrSize + 20;
 
-      // Left Column: Jan Seva Kendra details
-      doc.font('Hind-Bold').fontSize(8.5).fillColor('#000000');
-      doc.text(`जारी कर्ता केन्द्र: ${certificate.centerName}`, 35, sigY, { width: 175, lineGap: 1 });
-      doc.text(`पद: केन्द्र प्रभारी`, 35, sigY + 11);
-      doc.text(`स्थान :Ainth Pur,पलिया,पलियाकलॉ,पलिया,खीरी`, 35, sigY + 22, { width: 175, lineGap: 1 });
-      doc.text(`दिनॉंक: ${formatDate(certificate.issueDate)}`, 35, sigY + 45);
-      doc.text(`हस्ताक्षर एंव मुहर`, 35, sigY + 56);
+      // Left Column: Jan Seva Kendra details (Left empty per user request)
 
       // Middle Column: Digital signature text
       const midColX = 220;

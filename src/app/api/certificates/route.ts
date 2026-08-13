@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateApplicationId, generateCertificateId } from '@/lib/utils';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,24 +23,39 @@ export async function POST(req: NextRequest) {
       photoBase64,
     } = body;
 
+    // Default to the original certificate photo if not uploaded
+    let photoData = photoBase64;
+    if (!photoData) {
+      try {
+        const defaultPhotoPath = path.join(process.cwd(), 'public/showphotoCert.jpg');
+        if (fs.existsSync(defaultPhotoPath)) {
+          const buffer = fs.readFileSync(defaultPhotoPath);
+          photoData = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+        }
+      } catch (err) {
+        console.error('Failed to load default candidate photo on server fallback:', err);
+      }
+    }
+
     // Simple validation
     if (
       !fullName ||
       !fatherName ||
       !dob ||
-      !houseNo ||
       !village ||
       !thana ||
       !tehsil ||
       !district ||
       !pinCode ||
-      !photoBase64
+      !photoData
     ) {
       return NextResponse.json(
         { error: 'All required fields must be provided, including candidate photo.' },
         { status: 400 }
       );
     }
+
+    const resolvedHouseNo = houseNo || '00';
 
     // Generate unique Application ID
     let applicationId = '';
@@ -91,7 +108,7 @@ export async function POST(req: NextRequest) {
         fatherName,
         motherName: motherName || null,
         dob,
-        houseNo,
+        houseNo: resolvedHouseNo,
         streetLocality: streetLocality || null,
         village,
         thana,
@@ -99,7 +116,7 @@ export async function POST(req: NextRequest) {
         district,
         state: state || 'उत्तर प्रदेश',
         pinCode,
-        photoBase64,
+        photoBase64: photoData,
         // The QR code URL will point to our verification route
       },
     });

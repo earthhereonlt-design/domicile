@@ -35,12 +35,19 @@ export default function CertificatePreview({ certificate }: CertificatePreviewPr
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   useEffect(() => {
-    // Generate QR Code URL dynamically
-    const host = typeof window !== 'undefined' ? window.location.host : 'localhost:3000';
-    const protocol = host.startsWith('localhost') ? 'http' : 'https';
-    const verifyUrl = `${protocol}://${host}/verify/${certificate.id || 'preview'}`;
+    const qrData = `आवेदन क्र०: ${certificate.applicationId}
+प्रमाणपत्र क्र०: ${certificate.certificateId}
+प्रमाणित किया जाता है कि: ${certificate.fullName}
+पुत्र/पुत्री: ${certificate.fatherName}
+माता का नाम: ${certificate.motherName || 'संतोष देवी'}
+मकान नम्बर: ${certificate.houseNo}
+ग्राम: ${certificate.village}
+थाना: ${certificate.thana}
+तहसील: ${certificate.tehsil}
+जिला: ${certificate.district}
+जारी दिनांक: ${formatDate(certificate.issueDate)}`;
 
-    QRCode.toDataURL(verifyUrl, { margin: 1, width: 100 })
+    QRCode.toDataURL(qrData, { margin: 1, width: 100 })
       .then((url) => setQrCodeDataUrl(url))
       .catch((err) => console.error('Failed to generate preview QR code:', err));
   }, [certificate]);
@@ -141,12 +148,12 @@ export default function CertificatePreview({ certificate }: CertificatePreviewPr
                 </td>
               </tr>
 
-              {/* House No */}
+              {/* House No -> Date of Birth (जन्म तिथि) */}
               <tr>
                 <td className="w-[10%] align-middle"></td>
-                <td className="w-[32%] h-5 align-middle text-stone-700">मकान नम्बर</td>
+                <td className="w-[32%] h-5 align-middle text-stone-700">जन्म तिथि</td>
                 <td className="w-[33%] h-5 align-middle font-bold text-stone-950">
-                  {certificate.houseNo}
+                  {certificate.dob}
                 </td>
               </tr>
 
@@ -227,17 +234,8 @@ export default function CertificatePreview({ certificate }: CertificatePreviewPr
           <table className="w-full text-[10px] leading-relaxed border-collapse border-0">
             <tbody>
               <tr>
-                {/* Left: JSK Details */}
+                {/* Left: JSK Details (Left empty per user request) */}
                 <td className="w-[30%] align-bottom text-stone-950">
-                  <b>जारी कर्ता केन्द्र:</b> {certificate.centerName}
-                  <br />
-                  <b>पद:</b> केन्द्र प्रभारी
-                  <br />
-                  <b>स्थान :</b>Ainth Pur,पलिया,पलियाकलॉ,पलिया,खीरी
-                  <br />
-                  <b>दिनॉंक:</b> <span className="font-mono text-[10px]">{formatDate(certificate.issueDate)}</span>
-                  <br />
-                  <b>हस्ताक्षर एंव मुहर</b>
                 </td>
 
                 {/* Middle: Digital Signature Text */}

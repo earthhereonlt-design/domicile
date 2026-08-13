@@ -7,25 +7,22 @@ export function cn(...classes: (string | boolean | undefined | null)[]) {
 
 /**
  * Generates a collision-resistant application identifier.
- * Format: APP-YYYY-XXXXXX where XXXXXX is 6 random digits.
+ * Format: 26153002010XXXX where XXXX is 4 random digits.
  */
 export function generateApplicationId(): string {
-  const year = new Date().getFullYear();
-  const rand = Math.floor(100000 + Math.random() * 900000); // 6-digit number
-  return `APP-${year}-${rand}`;
+  const rand = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+  return `26153002010${rand}`;
 }
 
 /**
  * Generates a unique certificate identifier with a 4-digit suffix.
- * Format: CERT-YYYY-XXXX-ZZZZ where ZZZZ is the public suffix.
+ * Format: 23626201XXXX where XXXX is 4 random digits.
  */
 export function generateCertificateId(): { full: string; publicSuffix: string } {
-  const year = new Date().getFullYear();
-  const part1 = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
-  const suffix = Math.floor(1000 + Math.random() * 9000); // 4-digit random suffix
+  const rand = Math.floor(1000 + Math.random() * 9000); // 4-digit random suffix
   return {
-    full: `CERT-${year}-${part1}-${suffix}`,
-    publicSuffix: String(suffix),
+    full: `23626201${rand}`,
+    publicSuffix: String(rand),
   };
 }
 
