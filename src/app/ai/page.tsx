@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PhotoUpload from '@/components/PhotoUpload';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import { cn, formatDate } from '@/lib/utils';
+import CertificatePreview from '@/components/CertificatePreview';
 
 // AI steps definitions
 const AI_STEPS = [
@@ -258,7 +259,10 @@ export default function AIExtraction() {
       )}
 
       {/* Main wizard card */}
-      <div className="max-w-xl mx-auto bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs">
+      <div className={cn(
+        "mx-auto bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs",
+        generatedCertificate ? "max-w-3xl" : "max-w-xl"
+      )}>
         {errors.form && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-lg">
             {errors.form}
@@ -288,19 +292,8 @@ export default function AIExtraction() {
               The AI-extracted record has been processed, verified, and saved to the database.
             </p>
 
-            <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg text-left mb-8 border border-border-color text-xs space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-text">Application ID:</span>
-                <span className="font-semibold text-foreground">{generatedCertificate.applicationId}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-text">Certificate ID:</span>
-                <span className="font-semibold text-foreground">{generatedCertificate.certificateId}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-text">Candidate Name:</span>
-                <span className="font-semibold text-foreground">{generatedCertificate.fullName}</span>
-              </div>
+            <div className="mb-8">
+              <CertificatePreview certificate={generatedCertificate} />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

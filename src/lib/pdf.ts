@@ -47,24 +47,24 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
 
       // 5. Load State Emblem (UP Seal) in top center
       const emblemPath = path.join(process.cwd(), 'public/sealofup.jpg');
-      const centerLogoX = (doc.page.width / 2) - 45; // 90 width
+      const centerLogoX = (doc.page.width / 2) - 55; // 110 width
       if (fs.existsSync(emblemPath)) {
-        doc.image(emblemPath, centerLogoX, 42, { width: 90, height: 90 });
+        doc.image(emblemPath, centerLogoX, 38, { width: 110, height: 110 });
       }
 
       // 6. Header Titles (Exactly matching DOMICILE.html sizing & layout)
-      doc.font('Hind-Bold').fontSize(22).fillColor('#000000');
-      doc.text('उत्तर प्रदेश शासन', 0, 138, { align: 'center', width: doc.page.width });
+      doc.font('Hind-Bold').fontSize(24).fillColor('#000000');
+      doc.text('उत्तर प्रदेश शासन', 0, 154, { align: 'center', width: doc.page.width });
 
-      doc.fontSize(13.5).fillColor('#000000');
-      doc.text('कार्यालय उप जिलाधिकारी द्वारा प्रदत्त सामान्य निवास प्रमाण पत्र', 0, 168, {
+      doc.fontSize(14).fillColor('#000000');
+      doc.text('कार्यालय उप जिलाधिकारी द्वारा प्रदत्त सामान्य निवास प्रमाण पत्र', 0, 184, {
         align: 'center',
         width: doc.page.width,
       });
 
       // 7. Metadata Grid (Bilingual values, right-aligned date)
-      const metaY = 198;
-      doc.font('Hind-Bold').fontSize(10.5);
+      const metaY = 214;
+      doc.font('Hind-Bold').fontSize(10);
       doc.text('जिला', 35, metaY);
       doc.font('Hind-Bold').text(certificate.district, 85, metaY);
 
@@ -83,9 +83,9 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
       doc.font('Hind').text(formatDate(certificate.issueDate), rightColX + 60, metaY + 17);
 
       // 8. Core details table (borderless, with Lekhpal report text at row 1)
-      const gridStartY = 282;
-      const labelX = 60;
-      const valueX = 220;
+      const gridStartY = 298;
+      const labelX = 80;   // 10% blank margin inside 545pt width = 54.5pt. x = 25 + 54.5 = 79.5 -> 80
+      const valueX = 255;  // 32% label column = 174.5pt. x = 80 + 174.5 = 254.5 -> 255
       const rowHeight = 19;
 
       // Inquiry Report text
@@ -94,7 +94,7 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
       doc.text(inquiryText, labelX, gridStartY, { width: 330 });
 
       // Decode and Render Candidate Photo on the right side
-      const photoX = doc.page.width - 145; // 96 width
+      const photoX = 440; // 96 width
       const photoY = gridStartY;
       const photoWidth = 96;
       const photoHeight = 96;
@@ -197,12 +197,12 @@ export async function generateCertificatePDF(certificate: any, host: string): Pr
       doc.text(`O=Personal, S=Uttar Pradesh`, midColX, sigY + 36, { width: 150 });
 
       // Right Column: Competent Authority SDM details
-      const rightColSDMX = doc.page.width - 180;
+      const rightColSDMX = doc.page.width - 175;
       doc.font('Hind-Bold').fontSize(8.5).fillColor('#000000');
-      doc.text('सक्षम अधिकारी/उप जिलाधिकारी', rightColSDMX, sigY, { width: 150, align: 'center' });
-      doc.text('डिजिटल हस्ताक्षरित', rightColSDMX, sigY + 11, { width: 150, align: 'center' });
-      doc.text(`${certificate.signerLocation}`, rightColSDMX, sigY + 22, { width: 150, align: 'center' });
-      doc.font('Hind').text(`दिनॉंक: ${formatDate(certificate.issueDate)}`, rightColSDMX, sigY + 34, { width: 150, align: 'center' });
+      doc.text('सक्षम अधिकारी/उप जिलाधिकारी', rightColSDMX, sigY, { width: 140, align: 'center' });
+      doc.text('डिजिटल हस्ताक्षरित', rightColSDMX, sigY + 11, { width: 140, align: 'center' });
+      doc.text(`${certificate.signerLocation}`, rightColSDMX, sigY + 22, { width: 140, align: 'center' });
+      doc.font('Hind').text(`दिनॉंक: ${formatDate(certificate.issueDate)}`, rightColSDMX, sigY + 34, { width: 140, align: 'center' });
 
       // 12. Bottom Footer Note (Exact copy matching DOMICILE.html)
       const footerY = doc.page.height - 65;

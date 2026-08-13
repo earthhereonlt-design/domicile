@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { formatDate } from '@/lib/utils';
+import CertificatePreview from '@/components/CertificatePreview';
 
 interface VerifyPageProps {
   params: Promise<{ id: string }>;
@@ -35,7 +36,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
 
       {certificate ? (
         /* Verified Record Card */
-        <div className="w-full max-w-md bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs">
+        <div className="w-full max-w-3xl bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs">
           {/* Status Badge */}
           <div className="flex items-center gap-2.5 p-4 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg text-emerald-800 dark:text-emerald-400 mb-6">
             <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 shrink-0">
@@ -60,81 +61,20 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
             </div>
           </div>
 
-          {/* Certificate metadata */}
-          <h2 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wider text-muted-text border-b border-border-color pb-2">
-            Certificate Details
-          </h2>
-
-          <div className="text-xs space-y-3.5 divide-y divide-border-color/40">
-            <div className="grid grid-cols-3 pt-1">
-              <span className="text-muted-text">Applicant:</span>
-              <span className="col-span-2 font-semibold text-foreground">{certificate.fullName}</span>
-            </div>
-            
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Father's Name:</span>
-              <span className="col-span-2 font-semibold text-foreground">{certificate.fatherName}</span>
-            </div>
-
-            {certificate.motherName && (
-              <div className="grid grid-cols-3 pt-3.5">
-                <span className="text-muted-text">Mother's Name:</span>
-                <span className="col-span-2 font-semibold text-foreground">{certificate.motherName}</span>
-              </div>
-            )}
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Date of Birth:</span>
-              <span className="col-span-2 font-semibold text-foreground">{formatDate(certificate.dob)}</span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">District / state:</span>
-              <span className="col-span-2 font-semibold text-foreground">
-                {certificate.district}, {certificate.state}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Address:</span>
-              <span className="col-span-2 font-medium text-foreground leading-relaxed">
-                {certificate.houseNo}, {certificate.streetLocality ? `${certificate.streetLocality}, ` : ''}{certificate.village}, {certificate.thana}, {certificate.tehsil}, {certificate.district}, {certificate.state} - {certificate.pinCode}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Application ID:</span>
-              <span className="col-span-2 font-mono font-semibold text-foreground">{certificate.applicationId}</span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Certificate ID:</span>
-              <span className="col-span-2 font-mono font-semibold text-foreground">{certificate.certificateId}</span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Date of Issue:</span>
-              <span className="col-span-2 font-semibold text-foreground">{formatDate(certificate.issueDate)}</span>
-            </div>
-
-            <div className="grid grid-cols-3 pt-3.5">
-              <span className="text-muted-text">Signatory:</span>
-              <span className="col-span-2 font-semibold text-foreground">
-                {certificate.signerName} ({certificate.signerTitle})
-              </span>
-            </div>
+          <div className="mb-8">
+            <CertificatePreview certificate={certificate} />
           </div>
 
-          <div className="mt-8 flex flex-col gap-3">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href={`/api/certificates/${certificate.id}/pdf`}
-              className="w-full px-5 py-2.5 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-sm rounded-lg shadow-sm transition-colors text-center"
+              className="px-6 py-3 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-sm rounded-lg shadow-sm transition-colors text-center"
             >
               Download PDF Copy
             </a>
             <Link
               href="/"
-              className="w-full px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-sm rounded-lg transition-colors text-center"
+              className="px-6 py-3 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-sm rounded-lg transition-colors text-center"
             >
               Go to Home Screen
             </Link>
