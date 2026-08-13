@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import PhotoUpload from '@/components/PhotoUpload';
 import ProgressIndicator from '@/components/ProgressIndicator';
-import { cn, formatDate } from '@/lib/utils';
-import CertificatePreview from '@/components/CertificatePreview';
+import { cn } from '@/lib/utils';
 
 // AI steps definitions
 const AI_STEPS = [
@@ -13,8 +12,7 @@ const AI_STEPS = [
   { id: 2, name: 'AI Extract' },
   { id: 3, name: 'Review & Edit' },
   { id: 4, name: 'Photo' },
-  { id: 5, name: 'Verification' },
-  { id: 6, name: 'Generate' },
+  { id: 5, name: 'Generate' },
 ];
 
 export default function AIExtraction() {
@@ -27,8 +25,7 @@ export default function AIExtraction() {
   // Storing extracted confidence levels
   const [confidence, setConfidence] = useState<Record<string, number>>({});
 
-  // Generated certificate result
-  const [generatedCertificate, setGeneratedCertificate] = useState<any | null>(null);
+
 
   // Form State
   const [formData, setFormData] = useState({
@@ -205,7 +202,7 @@ export default function AIExtraction() {
         photoBase64: '',
         qrCodeEnabled: true,
       });
-      setDocImageBase64(null);
+      setDocImageBase64('');
       setConfidence({});
       setCurrentStep(1);
     } catch (err: any) {
@@ -271,73 +268,19 @@ export default function AIExtraction() {
         <span className="text-xs text-muted-text font-medium">Photo / AI Extraction Mode</span>
       </div>
 
-      {!generatedCertificate && currentStep !== 2 && (
+      {currentStep !== 2 && (
         <ProgressIndicator steps={AI_STEPS} currentStep={currentStep} />
       )}
 
       {/* Main wizard card */}
-      <div className={cn(
-        "mx-auto bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs",
-        generatedCertificate ? "max-w-3xl" : "max-w-xl"
-      )}>
+      <div className="max-w-xl mx-auto bg-white dark:bg-stone-900 border border-border-color rounded-xl p-6 md:p-8 shadow-xs">
         {errors.form && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-lg">
             {errors.form}
           </div>
         )}
 
-        {/* Success View */}
-        {generatedCertificate ? (
-          <div className="text-center py-6">
-            <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 flex items-center justify-center mx-auto mb-6 text-green-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Certificate Generated
-            </h2>
-            <p className="text-sm text-muted-text mb-8">
-              The AI-extracted record has been processed, verified, and saved to the database.
-            </p>
-
-            <div className="mb-8">
-              <CertificatePreview certificate={generatedCertificate} />
-            </div>
-
-            <div className="flex flex-col lg:flex-row gap-3 justify-center w-full">
-              <a
-                href={`/api/certificates/${generatedCertificate.id}/html`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-950 font-semibold text-xs rounded-lg shadow-sm transition-colors text-center flex-1 uppercase tracking-wider"
-              >
-                Print / Save PDF
-              </a>
-              <a
-                href={`/api/certificates/${generatedCertificate.id}/html?download=true`}
-                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
-              >
-                Download HTML
-              </a>
-              <Link
-                href={`/verify/${generatedCertificate.id}`}
-                className="px-5 py-2.5 border border-border-color hover:bg-stone-50 dark:hover:bg-stone-800 text-foreground font-semibold text-xs rounded-lg transition-colors text-center flex-1 uppercase tracking-wider"
-              >
-                Verify Record
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div>
+        <div>
             {/* Step 1: Upload Document Photo */}
             {currentStep === 1 && (
               <div className="space-y-6">
@@ -671,38 +614,10 @@ export default function AIExtraction() {
               </div>
             )}
 
-            {/* Step 5: QR Code Option */}
+
+
+            {/* Step 5: Confirmation Summary & Submit */}
             {currentStep === 5 && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-lg font-bold text-foreground mb-1">Digital Verification</h2>
-                  <p className="text-xs text-muted-text">
-                    Generate an inline QR Code linking to a secure, public verification page.
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 border border-border-color rounded-lg bg-white dark:bg-stone-900 shadow-2xs">
-                  <input
-                    type="checkbox"
-                    id="qrCodeEnabledAI"
-                    checked={formData.qrCodeEnabled}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, qrCodeEnabled: e.target.checked }))}
-                    className="w-4 h-4 mt-0.5 rounded text-accent accent-accent border-border-color"
-                  />
-                  <div>
-                    <label htmlFor="qrCodeEnabledAI" className="block text-sm font-semibold text-foreground mb-1 cursor-pointer">
-                      Generate Verification QR Code
-                    </label>
-                    <p className="text-xs text-muted-text">
-                      Encodes a secure digital URL: <code className="bg-stone-100 dark:bg-stone-800 px-1 rounded text-foreground font-mono">https://[domain]/verify/[certificate-id]</code>.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 6: Confirmation Summary & Submit */}
-            {currentStep === 6 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-lg font-bold text-foreground mb-1">Confirm and Compile</h2>
@@ -732,7 +647,7 @@ export default function AIExtraction() {
                     </div>
                     <div className="grid grid-cols-3 pt-3">
                       <span className="text-muted-text">Date of Birth:</span>
-                      <span className="col-span-2 font-semibold text-foreground">{formatDate(formData.dob)}</span>
+                      <span className="col-span-2 font-semibold text-foreground">{formData.dob}</span>
                     </div>
                     <div className="grid grid-cols-3 pt-3">
                       <span className="text-muted-text">District:</span>
@@ -810,7 +725,6 @@ export default function AIExtraction() {
               ) : null}
             </div>
           </div>
-        )}
       </div>
     </div>
   );
