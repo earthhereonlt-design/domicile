@@ -1,0 +1,76 @@
+﻿body
+{
+	
+}
+.td
+{
+	font-size: small;
+	background-color: gainsboro;
+}
+.tdblank
+{
+    border-right:  1px solid;
+    border-top:  1px solid;
+    border-left:  1px solid;
+    border-bottom:  1px solid;
+}
+.tdtop
+{
+	background-color: dimgray;
+	font-size: small;
+	font-family: Verdana;
+	color: #ffffff;
+}
+.tabdr
+{
+    font-size: small;
+    font-family: Verdana;
+    
+    font-weight: bold;
+    border-right:  #000000 2px solid;
+    border-top: #000000 2px solid;
+    border-left: #000000 2px solid;
+    border-bottom: #000000 2px solid;
+}
+
+/*
+Author : Sarika 
+Date   :  25 feb'08
+Detail : Used on Homepage side nevigation
+*/
+
+.style11 {font-family: Verdana, Arial, Helvetica, sans-serif; color: #002F00; }
+.style14 {font-family: Geneva, Arial, Helvetica, sans-serif; 
+          color: #333333;
+		  font-size: 14px;
+		  text-decoration: none;	
+		  font-weight: normal;
+
+         }
+
+
+DIV.a
+{
+    DISPLAY: none;
+}
+/*Label Text*/
+.LT
+{
+	font-size: 10pt;
+}
+
+.f1
+{
+	font-size: medium;
+}
+
+.mgn
+{
+	/*left: 0.25in;
+	position: absolute;
+	top: 2.75in;*/
+	left: 0.25in;
+	position: absolute;
+	top: 0.0in;
+	
+}

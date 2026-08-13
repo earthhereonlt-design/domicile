@@ -1,0 +1,34 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Certificate {
+  id                String   @id @default(uuid())
+  applicationId     String   @unique
+  certificateId     String   @unique
+  fullName          String
+  fatherName        String
+  motherName        String?
+  dob               String
+  houseNo           String
+  streetLocality    String?
+  village           String
+  thana             String
+  tehsil            String
+  district          String
+  state             String   @default("उत्तर प्रदेश")
+  pinCode           String
+  photoBase64       String   // Candidate photo stored as base64
+  qrCodeUrl         String?  // Verification URL or internal ID
+  issueDate         DateTime @default(now())
+  investigationDate DateTime @default(now())
+  centerName        String   @default("जेठ कुमार यादव, वयम जन सेवा केंद्र")
+  signerName        String   @default("Avneesh Kumar")
+  signerTitle       String   @default("सक्षम अधिकारी/उप जिलाधिकारी")
+  signerLocation    String   @default("पलिया,खीरी")
+}
