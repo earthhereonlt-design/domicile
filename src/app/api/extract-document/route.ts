@@ -97,26 +97,30 @@ export async function POST(req: NextRequest) {
       base64Data = match[2];
     }
 
-    const prompt = `You are a professional document processing system. Analyze the uploaded document image (which is a certificate, typically a General Domicile Certificate or Residence Certificate issued in India).
-Extract the details from it and return a structured JSON response matching the provided schema.
-For fields:
-- "name": Extract the candidate's full name (extract the English name if bilingual, e.g., Himanshu Kumar from Himanshu Kumar / हिमांशु कुमार).
-- "fatherName": Extract the father's name.
-- "motherName": Extract the mother's name (if present).
-- "dateOfBirth": Extract the date of birth (usually formatted as DD/MM/YYYY). If not present or if it contains a typo/address text instead of a date, return null.
-- "houseNo": Extract the house/building number (if not found or is '00', return '00').
-- "streetLocality": Extract the street, post, or locality.
-- "village": Extract the village, town, or city.
-- "thana": Extract the police station/thana (e.g. पलिया कलां).
-- "tehsil": Extract the Tehsil (e.g. पलिया).
-- "district": Extract the District (e.g. खीरी).
-- "state": Extract the State (e.g. उत्तर प्रदेश).
-- "pinCode": Extract the 6-digit PIN code (if present).
+    const prompt = `You are a professional document processing system. Analyze the uploaded image of an Indian government certificate (typically a General Domicile / Residence Certificate).
 
-For each extracted field, assign a confidence score between 0.0 (not found/uncertain) and 1.0 (highly confident/clear text).
-CRITICAL RULES:
-1. Never fabricate or guess missing information. If a field is not present in the document, set its value to null and its confidence score to 0.0.
-2. If the text is illegible, set its value to null.`;
+Extract the following fields and return them as structured JSON. For EVERY field:
+- If the field is CLEARLY VISIBLE and READABLE in the document, extract it exactly as written.
+- If the field is NOT PRESENT, NOT VISIBLE, ILLEGIBLE, or UNCLEAR, return an EMPTY STRING "" for that field and set its confidence score to 0.0.
+- NEVER fabricate, guess, or invent any data.
+- NEVER use placeholder text — only return what is actually printed on the document.
+
+Fields to extract:
+- "name": Full name of the applicant (prefer English if bilingual, e.g. "Himanshu Kumar").
+- "fatherName": Father's full name.
+- "motherName": Mother's full name (if present, else "").
+- "dateOfBirth": Date of birth in DD/MM/YYYY format (if present, else "").
+- "houseNo": House or building number (if not found or shown as '00', return "00").
+- "streetLocality": Street, post, or locality description (if not found, return "").
+- "village": Village, town, or city name.
+- "thana": Police station / Thana name.
+- "tehsil": Tehsil name.
+- "district": District name.
+- "state": State name.
+- "pinCode": 6-digit PIN code (if present, else "").
+
+For each field, also provide a confidence score from 0.0 (not found / uncertain) to 1.0 (clearly readable).`;
+
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',

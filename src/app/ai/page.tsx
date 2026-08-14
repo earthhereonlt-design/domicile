@@ -86,21 +86,23 @@ export default function AIExtraction() {
         throw new Error(data.error || 'Failed to extract details from document.');
       }
 
-      // Populate form state with extracted AI values
+      // Populate form state — if AI returned empty/null for a field, keep it blank
+      // so the user sees exactly what was (or wasn't) found on the document
+      const val = (v: any) => (v == null ? '' : String(v));
       setFormData((prev) => ({
         ...prev,
-        fullName: data.name || '',
-        fatherName: data.fatherName || '',
-        motherName: data.motherName || '',
-        dob: data.dateOfBirth || '',
-        houseNo: data.houseNo || '00',
-        streetLocality: data.streetLocality || '',
-        village: data.village || '',
-        thana: data.thana || '',
-        tehsil: data.tehsil || '',
-        district: data.district || '',
-        state: data.state || 'उत्तर प्रदेश',
-        pinCode: data.pinCode || '',
+        fullName: val(data.name),
+        fatherName: val(data.fatherName),
+        motherName: val(data.motherName),
+        dob: val(data.dateOfBirth),
+        houseNo: val(data.houseNo) || '00',
+        streetLocality: val(data.streetLocality),
+        village: val(data.village),
+        thana: val(data.thana),
+        tehsil: val(data.tehsil),
+        district: val(data.district),
+        state: val(data.state),
+        pinCode: val(data.pinCode),
       }));
 
       // Store confidence scores
